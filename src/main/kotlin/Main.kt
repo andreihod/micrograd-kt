@@ -1,4 +1,3 @@
-
 fun main() {
     val a = Value(-4.0)
     val b = Value(2.0)
@@ -12,7 +11,6 @@ fun main() {
     val f = e.pow(2)
     var g = f / 2.0
     g += 10.0 / f
-
     println("${g.data}")
     g.backward()
     println("${a.grad}")
