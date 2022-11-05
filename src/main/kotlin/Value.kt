@@ -3,17 +3,16 @@ import kotlin.math.pow
 data class Value(
     val data: Double,
     private val children: List<Value>? = null,
-    private val op: String? = null,
-    var grad: Double = 0.0
+    private val op: String? = null
 ) {
-    private var visited = false
+    var grad: Double = 0.0
     private var _backward: () -> Unit = {}
 
     operator fun plus(other: Value): Value {
         val out = Value(data + other.data, listOf(this, other), "+")
 
         out._backward = {
-            this.grad += out.grad
+            grad += out.grad
             other.grad += out.grad
         }
 
@@ -24,8 +23,8 @@ data class Value(
         val out = Value(data * other.data, listOf(this, other), "*")
 
         out._backward = {
-            this.grad += other.data * out.grad
-            other.grad += this.data * out.grad
+            grad += other.data * out.grad
+            other.grad += data * out.grad
         }
 
         return out
@@ -33,30 +32,25 @@ data class Value(
 
     private fun pow(other: Double): Value {
         val out = Value(data.pow(other), listOf(this), "**${other}")
-
-        out._backward = {
-            this.grad += (other * this.data.pow(other - 1)) * out.grad
-        }
+        out._backward = { grad += (other * this.data.pow(other - 1)) * out.grad }
 
         return out
     }
 
     fun relu(): Value {
         val out = Value(data.coerceAtLeast(0.0), listOf(this), "ReLU")
-
-        out._backward = {
-            if (out.data > 0.0) this.grad += out.grad
-        }
+        out._backward = { if (out.data > 0.0) grad += out.grad }
 
         return out
     }
 
     fun backward() {
         val topo = mutableListOf<Value>()
+        val visited = mutableListOf<Value>()
 
         fun buildTopo(value: Value) {
-            if (!value.visited) {
-                value.visited = true
+            if (visited.none { it === value }) {
+                visited.add(value)
 
                 value.children?.let {
                     for (child in it) {
@@ -69,7 +63,7 @@ data class Value(
         }
 
         buildTopo(this)
-        this.grad = 1.0
+        grad = 1.0
         topo.reversed().map { it._backward() }
     }
 

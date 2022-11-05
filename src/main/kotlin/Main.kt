@@ -11,8 +11,10 @@ fun main() {
     val f = e.pow(2)
     var g = f / 2.0
     g += 10.0 / f
-    println("${g.data}")
+
+    println("${g.data}") // prints ~24.7041, the outcome of this forward pass
     g.backward()
-    println("${a.grad}")
-    println("${b.grad}")
+
+    println("${a.grad}") // prints ~138.8338, i.e. the numerical value of dg/da
+    println("${b.grad}") // prints ~645.5773, i.e. the numerical value of dg/db
 }
