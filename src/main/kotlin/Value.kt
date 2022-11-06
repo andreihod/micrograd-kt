@@ -92,3 +92,5 @@ operator fun Int.plus(other: Value) = this.toDouble() + other
 operator fun Int.times(other: Value) = this.toDouble() * other
 operator fun Int.minus(other: Value) = this.toDouble() - other
 operator fun Int.div(other: Value) = this.toDouble() / other
+
+fun List<Value>.sum() = reduce { acc, value -> acc + value }
